@@ -72,7 +72,7 @@ Bloom::Bloom(const uint8_t* bitset, uint32_t num_bytes)
     this->hashFunc = &MurmurHash3_x64_128;
     break;
   default:
-    throw new parquet::ParquetException("Not supported hash strategy");
+    throw parquet::ParquetException("Not supported hash strategy");
   }
 }
 
