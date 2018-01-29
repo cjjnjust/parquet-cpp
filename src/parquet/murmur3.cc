@@ -247,10 +247,10 @@ void MurmurHash3_x86_128(const void * key, const int len,
   h1 += h2; h1 += h3; h1 += h4;
   h2 += h1; h3 += h1; h4 += h1;
 
-  reinterpret<uint32_t*>(out)[0] = h1;
-  reinterpret<uint32_t*>(out)[1] = h2;
-  reinterpret<uint32_t*>(out)[2] = h3;
-  reinterpret<uint32_t*>(out)[3] = h4;
+  reinterpret_cast<uint32_t*>(out)[0] = h1;
+  reinterpret_cast<uint32_t*>(out)[1] = h2;
+  reinterpret_cast<uint32_t*>(out)[2] = h3;
+  reinterpret_cast<uint32_t*>(out)[3] = h4;
 }
 
 //-----------------------------------------------------------------------------

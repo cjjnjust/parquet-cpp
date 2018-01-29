@@ -113,37 +113,37 @@ class Bloom {
   // Compute hash for int value by using its plain encoding result.
   // @param value the value to hash.
   // @return hash result.
-  uint64_t hash(const int value);
+  uint64_t hash(int value);
 
   // Compute hash for long value by using its plain encoding result.
   // @param value the value to hash.
   // @return hash result.
-  uint64_t hash(const int64_t value);
+  uint64_t hash(int64_t value);
 
   // Compute hash for float value by using its plain encoding result.
   // @param value the value to hash.
   // @return hash result.
-  uint64_t hash(const float value);
+  uint64_t hash(float value);
 
   // Compute hash for double value by using its plain encoding result.
   // @param value the value to hash.
   // @return hash result.
-  uint64_t hash(const double value);
+  uint64_t hash(double value);
 
   // Compute hash for Int96 value by using its plain encoding result.
   // @param value the value to hash.
   // @return hash result.
-  uint64_t hash(const Int96 &value);
+  uint64_t hash(const Int96 *value);
 
   // Compute hash for ByteArray value by using its plain encoding result.
   // @param value the value to hash.
   // @return hash result.
-  uint64_t hash(const ByteArray &value);
+  uint64_t hash(const ByteArray *value);
 
   // Compute hash for Fixed Length Byte Array value by using its plain encoding result.
   // @param value the value to hash.
   // @return hash result.
-  uint64_t hash(const FLBA &value, uint32_t len);
+  uint64_t hash(const FLBA *value, uint32_t len);
 
   // Write bloom filter to output stream. A bloom filter structure should include
   // bitset length, hash strategy, algorithm, and bitset.
@@ -168,7 +168,7 @@ class Bloom {
   Algorithm algorithm;
 
   // The underlying byte array for bloom filter bitset.
-  uint8_t* bitset;
+  std::unique_ptr<uint8_t[]> bitset;
 
   // Hash function applied.
   HashFunc hashFunc;

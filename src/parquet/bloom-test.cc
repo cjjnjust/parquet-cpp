@@ -84,7 +84,7 @@ TEST(FPPTest, TestBloomFilter) {
         std::string tmp = str.substr(0, 10);
         ByteArray byte_array(10, reinterpret_cast<const uint8_t*>(tmp.c_str()));
         random_strings.push_back(tmp);
-        bloom->insert(bloom->hash(byte_array));
+        bloom->insert(bloom->hash(&byte_array));
     }
 
     std::shared_ptr<InMemoryOutputStream> sink;
@@ -112,12 +112,12 @@ TEST(FPPTest, TestBloomFilter) {
     for (int i = 0; i < 100000; i++) {
         ByteArray byte_array1(10,
             reinterpret_cast<const uint8_t*>(random_strings[i].c_str()));
-        ASSERT_TRUE(de_bloom->find(de_bloom->hash(byte_array1)));
+        ASSERT_TRUE(de_bloom->find(de_bloom->hash(&byte_array1)));
         std::shuffle(str.begin(), str.end(), generator);
         std::string tmp = str.substr(0, 8);
         ByteArray byte_array2(8, reinterpret_cast<const uint8_t*>(tmp.c_str()));
 
-        if (de_bloom->find(de_bloom->hash(byte_array2))) {
+        if (de_bloom->find(de_bloom->hash(&byte_array2))) {
             exist++;
         }
     }
