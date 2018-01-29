@@ -38,7 +38,7 @@ TEST(Murmur3Test, TestBloomFilter) {
 TEST(FindTest, TestBloomFilter) {
   std::unique_ptr<Bloom> bloom(new Bloom(1024));
 
-  for(int i = 0; i<10; i++) {
+  for (int i = 0; i < 10; i++) {
     uint64_t hash_value = bloom->hash(i);
     bloom->insert(hash_value);
   }
@@ -65,7 +65,7 @@ TEST(FindTest, TestBloomFilter) {
 
   const uint8_t* bitset = source->Read(length, &bytes_avaliable);
   std::unique_ptr<Bloom> de_bloom(new Bloom(bitset, length));
-  for(int i = 0; i<10; i++) {
+  for (int i = 0; i < 10; i++) {
     ASSERT_TRUE(de_bloom->find(bloom->hash(i)));
   }
 }
@@ -74,14 +74,14 @@ TEST(FPPTest, TestBloomFilter) {
     int exist = 0;
     std::string str("0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz");
     std::vector<std::string> random_strings;
-	std::unique_ptr<Bloom> bloom(new Bloom(Bloom::optimalNumOfBits(100000, 0.01)));
+    std::unique_ptr<Bloom> bloom(new Bloom(Bloom::optimalNumOfBits(100000, 0.01)));
 
-	// Insert 100000 elements to bloom filter and serialize to memory
+    // Insert 100000 elements to bloom filter and serialize to memory
     std::random_device rd;
     std::mt19937 generator(rd());
     for (int i = 0; i < 100000; i++) {
         std::shuffle(str.begin(), str.end(), generator);
-        std::string tmp = str.substr(0,10);
+        std::string tmp = str.substr(0, 10);
         ByteArray byte_array(10, reinterpret_cast<const uint8_t*>(tmp.c_str()));
         random_strings.push_back(tmp);
         bloom->insert(bloom->hash(byte_array));
@@ -92,7 +92,8 @@ TEST(FPPTest, TestBloomFilter) {
     bloom->writeTo(sink);
 
     // Deserialize bloom filter from memory
-    std::shared_ptr<InMemoryInputStream> source(new InMemoryInputStream(sink->GetBuffer()));
+    std::shared_ptr<InMemoryInputStream> source(
+        new InMemoryInputStream(sink->GetBuffer()));
     int64_t bytes_avaliable;
     uint32_t length = *(reinterpret_cast<const uint32_t *>(
         source->Read(4, &bytes_avaliable)));
@@ -109,15 +110,16 @@ TEST(FPPTest, TestBloomFilter) {
 
     std::unique_ptr<Bloom> de_bloom(new Bloom(bitset, length));
     for (int i = 0; i < 100000; i++) {
-    	ByteArray byte_array1(10, reinterpret_cast<const uint8_t*>(random_strings[i].c_str()));
-    	ASSERT_TRUE(de_bloom->find(de_bloom->hash(byte_array1)));
-    	std::shuffle(str.begin(), str.end(), generator);
-    	std::string tmp = str.substr(0,8);
-    	ByteArray byte_array2(8, reinterpret_cast<const uint8_t*>(tmp.c_str()));
+        ByteArray byte_array1(10,
+            reinterpret_cast<const uint8_t*>(random_strings[i].c_str()));
+        ASSERT_TRUE(de_bloom->find(de_bloom->hash(byte_array1)));
+        std::shuffle(str.begin(), str.end(), generator);
+        std::string tmp = str.substr(0, 8);
+        ByteArray byte_array2(8, reinterpret_cast<const uint8_t*>(tmp.c_str()));
 
-    	if (de_bloom->find(de_bloom->hash(byte_array2))) {
-    		exist++;
-    	}
+        if (de_bloom->find(de_bloom->hash(byte_array2))) {
+            exist++;
+        }
     }
 
     // The exist should be probably less than 1000 according default FPP 0.01.

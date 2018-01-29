@@ -64,7 +64,7 @@ void Bloom::initBitset(uint32_t num_bytes) {
 Bloom::Bloom(const uint8_t* bitset, uint32_t num_bytes)
     : num_bytes(num_bytes),
       hash_strategy(MURMUR3_X64_128),
-      algorithm(BLOCK){
+      algorithm(BLOCK) {
   this->bitset = new uint8_t[num_bytes];
   memcpy(this->bitset, bitset, num_bytes);
   switch (hash_strategy) {
@@ -80,11 +80,11 @@ void Bloom::setMask(uint32_t key, uint32_t mask[8]) {
   for (int i = 0; i < 8; ++i) {
     mask[i] = key * SALT[i];
   }
-  
+
   for (int i = 0; i < 8; ++i) {
     mask[i] = mask[i] >> 27;
   }
-  
+
   for (int i = 0; i < 8; ++i) {
     mask[i] = 0x1U << mask[i];
   }
@@ -151,55 +151,56 @@ bool Bloom::find(uint64_t hash) {
   return contains(hash);
 }
 
-void Bloom::insert(unsigned long long hash) {
+void Bloom::insert(uint64_t hash) {
   addElement(hash);
 }
 
 uint64_t Bloom::hash(int value) {
   uint64_t out[2];
-  (*hashFunc)((void*)&value, sizeof(int), DEFAULT_SEED, &out);
+  (*hashFunc)(reinterpret_cast<void *>(&value), sizeof(int), DEFAULT_SEED, &out);
   return out[0];
 }
 
-uint64_t Bloom::hash(const long value) {
+uint64_t Bloom::hash(const int64_t value) {
   uint64_t out[2];
-  (*hashFunc)((void*)&value, sizeof(long), DEFAULT_SEED, &out);
+  (*hashFunc)(reinterpret_cast<void*>(&value), sizeof(int64_t), DEFAULT_SEED, &out);
   return out[0];
 }
 
 uint64_t Bloom::hash(const float value) {
   uint64_t out[2];
-  (*hashFunc)((void*)&value, sizeof(float), DEFAULT_SEED, &out);
+  (*hashFunc)(reinterpret_cast<void *>(&value), sizeof(float), DEFAULT_SEED, &out);
   return out[0];
 }
 
 
 uint64_t Bloom::hash(const double value) {
   uint64_t out[2];
-  (*hashFunc)((void*)&value, sizeof(double), DEFAULT_SEED, &out);
+  (*hashFunc)(reinterpret_cast<void *>(&value), sizeof(double), DEFAULT_SEED, &out);
   return out[0];
 }
 
 
 uint64_t Bloom::hash(const Int96 &value) {
   uint64_t out[2];
-  (*hashFunc)((void*)value.value, sizeof(value.value), DEFAULT_SEED, &out);
+  (*hashFunc)(reinterpret_cast<void *>(value.value), sizeof(value.value),
+    DEFAULT_SEED, &out);
   return out[0];
 }
 
 uint64_t Bloom::hash(const ByteArray &value) {
   uint64_t out[2];
-  (*hashFunc)((void*)value.ptr, value.len, DEFAULT_SEED, &out);
+  (*hashFunc)(reinterpret_cast<void *>(value.ptr), value.len, DEFAULT_SEED, &out);
   return out[0];
 }
 
 uint64_t Bloom::hash(const FLBA &value, uint32_t len) {
   uint64_t out[2];
-  (*hashFunc)((void*)value.ptr, len, DEFAULT_SEED, &out);
+  (*hashFunc)(reinterpret_cast<void *>(value.ptr), len, DEFAULT_SEED, &out);
   return out[0];
 }
 
-void Bloom::writeTo(const std::shared_ptr<OutputStream>& sink){
+void Bloom::writeTo(const std::shared_ptr<OutputStream>& sink) {
   sink->Write(reinterpret_cast<const uint8_t *>(&num_bytes), sizeof(uint32_t));
   sink->Write(reinterpret_cast<const uint8_t *>(&hash_strategy), sizeof(uint32_t));
   sink->Write(reinterpret_cast<const uint8_t *>(&algorithm), sizeof(uint32_t));

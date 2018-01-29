@@ -24,21 +24,21 @@
 #include "parquet/types.h"
 #include "parquet/util/memory.h"
 
-namespace parquet{
-  class OutputStream;
-  
- // Bloom Filter is a compact structure to indicate whether an item is not in set or
- // probably in set. Bloom class is underlying class of Bloom Filter which stores a
- // bit set represents elements set, hash strategy and bloom filter algorithm.
+namespace parquet {
+class OutputStream;
 
- // Bloom Filter algorithm is implemented using block Bloom filters from Putze et al.'s
- // "Cache-,Hash- and Space-Efficient Bloom Filters". The basic idea is to hash the
- // item to a tiny Bloom Filter which size fit a single cache line or smaller. This
- // implementation sets 8 bits in each tiny Bloom Filter. Tiny bloom filter are 32
- // bytes to take advantage of 32-bytes SIMD instruction.
+// Bloom Filter is a compact structure to indicate whether an item is not in set or
+// probably in set. Bloom class is underlying class of Bloom Filter which stores a
+// bit set represents elements set, hash strategy and bloom filter algorithm.
+
+// Bloom Filter algorithm is implemented using block Bloom filters from Putze et al.'s
+// "Cache-,Hash- and Space-Efficient Bloom Filters". The basic idea is to hash the
+// item to a tiny Bloom Filter which size fit a single cache line or smaller. This
+// implementation sets 8 bits in each tiny Bloom Filter. Tiny bloom filter are 32
+// bytes to take advantage of 32-bytes SIMD instruction.
 
 class Bloom {
-public:
+ public:
   // Hash strategy available for bloom filter.
   enum HashStrategy {
     MURMUR3_X64_128
@@ -73,23 +73,24 @@ public:
       0xa2b7289dU, 0x705495c7U, 0x2df1424bU, 0x9efc4947U, 0x5c6bfb31U };
 
   typedef void (*HashFunc)(const void *, int, uint32_t, void*);
-public:
+
+ public:
   /// Constructor of bloom filter, if numBytes is zero, bloom filter bitset
   /// will be created lazily and the number of bytes will be calculated through
   /// distinct values in cache. It use murmur3_x64_128 as its default hash function
   /// and block based algorithm as default algorithm.
   /// @param num_bytes The number of bytes for bloom filter bitset, set to zero can
   ///               let it calculate number automatically by using default DEFAULT_FPP.
-  Bloom(uint32_t num_bytes);
-  
-  
+  explicit Bloom(uint32_t num_bytes);
+
+
   /// Construct the bloom filter with given bit set, it is used when reconstruct
   /// bloom filter from parquet file.It use murmur3_x64_128 as its default hash
   /// function and block based algorithm as default algorithm.
   /// @param bitset The given bitset to construct bloom filter.
   /// @param len Length of bitset.
   Bloom(const uint8_t* bitset, uint32_t len);
-  
+
   Bloom(const Bloom& orig) = delete;
   virtual ~Bloom();
 
@@ -99,7 +100,7 @@ public:
   // @param fpp: The false positive probability.
   // @return optimal number of bits of given n and p.
   static uint32_t optimalNumOfBits(uint32_t ndv, double fpp);
-  
+
   // Determine whether an element exist in set or not.
   // @param hash the element to contain.
   // @return false if value is definitely not in set, and true means PROBABLY in set.
@@ -107,7 +108,7 @@ public:
 
   // Insert element to set represented by bloom bitset.
   // @param hash the hash of value to insert into bloom filter..
-  void insert(unsigned long long hash);
+  void insert(uint64_t hash);
 
   // Compute hash for int value by using its plain encoding result.
   // @param value the value to hash.
@@ -117,7 +118,7 @@ public:
   // Compute hash for long value by using its plain encoding result.
   // @param value the value to hash.
   // @return hash result.
-  uint64_t hash(const long value);
+  uint64_t hash(const int64_t value);
 
   // Compute hash for float value by using its plain encoding result.
   // @param value the value to hash.
@@ -143,13 +144,13 @@ public:
   // @param value the value to hash.
   // @return hash result.
   uint64_t hash(const FLBA &value, uint32_t len);
-  
+
   // Write bloom filter to output stream. A bloom filter structure should include
   // bitset length, hash strategy, algorithm, and bitset.
   // @param sink output stream to write
   void writeTo(const std::shared_ptr<OutputStream>& sink);
 
-private:
+ private:
   // Create a new bitset for bloom filter, at least 256 bits will be create.
   // @param numBytes number of bytes for bitset
   void initBitset(uint32_t num_bytes);
@@ -172,6 +173,6 @@ private:
   // Hash function applied.
   HashFunc hashFunc;
 };
-}
+} // namespace parquet
 #endif /* BLOOM_H */
 
