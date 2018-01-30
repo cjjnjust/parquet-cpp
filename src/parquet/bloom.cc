@@ -17,6 +17,7 @@
 #include "parquet/bloom.h"
 
 #include <algorithm>
+#include <cmath>
 #include <cstdint>
 
 #include "arrow/util/bit-util.h"
@@ -59,6 +60,7 @@ void Bloom::initBitset(uint32_t num_bytes) {
   }
 
   this->bitset.reset(new uint8_t[num_bytes]);
+  memset(this->bitset.get(), 0, num_bytes);
 }
 
 Bloom::Bloom(const uint8_t* bitset, uint32_t num_bytes)
