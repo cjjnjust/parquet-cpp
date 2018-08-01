@@ -212,18 +212,6 @@ class BlockSplitBloomFilter : public BloomFilter {
   uint64_t Hash(const FLBA *value, uint32_t len) const override {
     return hasher_->Hash(value, len);
   }
-
-  /// Test bits in the bitset according to the hash value.
-  ///
-  /// @param hash the hash used to calculate bit index to test
-  /// @return true
-  bool TestBits(uint64_t hash) const;
-
-  /// Set bits in the bitset according to the hash value
-  ///
-  /// @param hash the hash used to calculate bit index to set
-  void SetBits(uint64_t hash) const;
-
   /// Deserialize the Bloom filter from an input stream. It is used when reconstructing
   /// a Bloom filter from a parquet filter.
   ///
@@ -236,6 +224,17 @@ class BlockSplitBloomFilter : public BloomFilter {
   /// @param key the value to calculate mask values.
   /// @param mask the mask array is used to set inside a block
   void SetMask(uint32_t key, BlockMask &mask) const;
+
+  /// Test bits in the bitset according to the hash value.
+  ///
+  /// @param hash the hash used to calculate bit index to test
+  /// @return true
+  bool TestBits(uint64_t hash) const;
+
+  /// Set bits in the bitset according to the hash value
+  ///
+  /// @param hash the hash used to calculate bit index to set
+  void SetBits(uint64_t hash);
 
   // Memory pool to allocate aligned buffer for bitset
   ::arrow::MemoryPool *pool_;

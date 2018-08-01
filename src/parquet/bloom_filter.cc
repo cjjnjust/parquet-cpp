@@ -64,7 +64,7 @@ BlockSplitBloomFilter::BlockSplitBloomFilter(const uint8_t* bitset, uint32_t num
 
   if (num_bytes < MINIMUM_BLOOM_FILTER_BYTES || num_bytes > MAXIMUM_BLOOM_FILTER_BYTES ||
       (num_bytes & (num_bytes - 1)) != 0) {
-    throw parquet::ParquetException("Given length of bitset is illegal");
+    throw ParquetException("Given length of bitset is illegal");
   }
 
   num_bytes_ = num_bytes;
@@ -145,7 +145,7 @@ bool BlockSplitBloomFilter::TestBits(uint64_t hash) const {
   return true;
 }
 
-void BlockSplitBloomFilter::SetBits(uint64_t hash) const {
+void BlockSplitBloomFilter::SetBits(uint64_t hash) {
   const uint32_t bucket_index =
       static_cast<uint32_t>(hash >> 32) & (num_bytes_ / BYTES_PER_FILTER_BLOCK - 1);
   uint32_t key = static_cast<uint32_t>(hash);
